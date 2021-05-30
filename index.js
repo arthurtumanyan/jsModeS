@@ -2,9 +2,9 @@
 const mqtt = require('mqtt');
 const mqttClient = mqtt.connect('mqtt://127.0.0.1');
 const common = require('./common');
-const bds08 = require('./decoder/bds/bsd08');
+const bds08 = require('./decoder/bds/bds08');
 
-const msg = "8C4841753A9A153237AEF0F275BE"
+const msg = "2A00516D492B80"
 const msgA = "8D406B902015A678D4D220AA4BDA"
 const msgB = "8D4CA251204994B1C36E60A5343D"
 const msgT = "007118F77AA25D4BB1E345EC2A";
@@ -61,11 +61,11 @@ let is_icao_assigned = common().is_icao_assigned(icao);
 let typecode = common().typecode(msg);
 let cprNL = common().cprNL(56.7);
  */
-//let idcode = common().idcode(msg);
+let idcode = common().idcode(msg);
 //let altcode = common().altcode(msg);
-let category = bds08().category(msg);
-let callsign = bds08().callsign(msg);
-console.log('Category: ', category, 'Callsign: ', callsign);
+//let category = bds08().category(msg);
+//let callsign = bds08().callsign(msg);
+//console.log('Category: ', category, 'Callsign: ', callsign, 'Icao: ', common().icao(msg));
 
 
 //console.log(hex2bin);
@@ -77,6 +77,6 @@ console.log('Category: ', category, 'Callsign: ', callsign);
 //console.log(is_icao_assigned);
 //console.log(typecode);
 //console.log(cprNL);
-//console.log(idcode);
+console.log(idcode);
 //console.log("altcode: ", altcode)
 

@@ -1,6 +1,11 @@
 const common = require('../../common');
 
 module.exports = () => {
+    Math.degrees = function(radians)
+    {
+        var pi = Math.PI;
+        return radians * (180/pi);
+    }
     return {
         airborne_velocity(msg, source = false) {
             let spd;
@@ -107,10 +112,20 @@ module.exports = () => {
             } else {
                 vs = parseInt(vr_sign * (vr - 1) * 64);
             }
+            spd = parseInt(spd);
+            trk_or_hdg = parseFloat(trk_or_hdg);
+            vs = parseInt(vs);
+            spd_type = String(spd_type);
+            dir_type = String(dir_type);
+            vr_source = String(vr_source);
             if (source === true) {
-                return [spd, trk_or_hdg, vs, spd_type, dir_type, vr_source];
+                return {
+                   spd, trk_or_hdg, vs, spd_type, dir_type, vr_source
+                };
             } else {
-                return [spd, trk_or_hdg, vs, spd_type];
+                return {
+                    spd, trk_or_hdg, vs, spd_type
+                };
             }
         },
         altitude_diff(msg) {

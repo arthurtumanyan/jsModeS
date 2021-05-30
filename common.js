@@ -222,7 +222,7 @@ module.exports = () => {
             let Mbit = binstr.toString().charAt(6);
             let Qbit = binstr.toString().charAt(8);
 
-            if (this.bin2int(binstr) === 0) {
+            if (Number(this.bin2int(binstr)) === 0) {
                 alt = undefined;
             } else if (Mbit === "0") {
                 if (Qbit === "1") {
@@ -262,7 +262,7 @@ module.exports = () => {
                 return undefined;
             }
 
-            if (n100 === 7) {
+            if (Number(n100) === 7) {
                 n100 = 5;
             }
 
@@ -270,8 +270,7 @@ module.exports = () => {
             if (n500 % 2) {
                 n100 = 6 - n100;
             }
-            let alt = (n500 * 500 + n100 * 100) - 1300;
-            return alt;
+            return (n500 * 500 + n100 * 100) - 1300;
         },
         gray2int(binstr) {
             let num = this.bin2int(binstr)
@@ -293,9 +292,14 @@ module.exports = () => {
             }
         },
         wrongstatus(data, sb, msb, lsb) {
-            let data_splitted = data.split('');
-            let status = parseInt(data_splitted[sb - 1]);
+            let status = parseInt(data.toString().charAt(sb - 1));
             let value = this.bin2int(data.toString().slice(msb - 1, lsb));
-        }
+            if(!status){
+                if(Number(value) !== 0){
+                    return true;
+                }
+            }
+            return false;
+        },
     }
 }

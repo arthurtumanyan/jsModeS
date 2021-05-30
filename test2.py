@@ -1,58 +1,81 @@
 # ------------------------------------------
-#   BDS 0,8
-#   ADS-B TC=1-4
-#   Aircraft identitification and category
+#   BDS 1,7
+#   Common usage GICB capability report
 # ------------------------------------------
 
 from pyModeS import common
 
 
-def category(msg):
-    """Aircraft category number
+def is17(msg):
+    """Check if a message is likely to be BDS code 1,7
 
     Args:
         msg (str): 28 hexdigits string
 
     Returns:
-        int: category number
+        bool: True or False
     """
 
-    if common.typecode(msg) < 1 or common.typecode(msg) > 4:
-        raise RuntimeError("%s: Not a identification message" % msg)
+    if common.allzeros(msg):
+        return False
 
-    msgbin = common.hex2bin(msg)
-    mebin = msgbin[32:87]
-    return common.bin2int(mebin[5:8])
+    d = common.hex2bin(common.data(msg))
+
+    if common.bin2int(d[24:56]) != 0:
+        return False
+
+    caps = cap17(msg)
+
+    # basic BDS codes for ADS-B shall be supported
+    #   assuming ADS-B out is installed (2017EU/2020US mandate)
+    # if not set(['BDS05', 'BDS06', 'BDS08', 'BDS09', 'BDS20']).issubset(caps):
+    #     return False
+
+    # at least you can respond who you are
+    if "BDS20" not in caps:
+        return False
+
+    return True
 
 
-def callsign(msg):
-    """Aircraft callsign
+def cap17(msg):
+    """Extract capacities from BDS 1,7 message
 
     Args:
         msg (str): 28 hexdigits string
 
     Returns:
-        string: callsign
+        list: list of support BDS codes
     """
+    allbds = [
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "0A",
+        "20",
+        "21",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "48",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "5F",
+        "60",
+    ]
 
-    if common.typecode(msg) < 1 or common.typecode(msg) > 4:
-        raise RuntimeError("%s: Not a identification message" % msg)
+    d = common.hex2bin(common.data(msg))
+    idx = [i for i, v in enumerate(d[:24]) if v == "1"]
+    capacity = ["BDS" + allbds[i] for i in idx]
 
-    chars = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ#####_###############0123456789######"
-    msgbin = common.hex2bin(msg)
-    csbin = msgbin[40:96]
-
-    cs = ""
-    cs += chars[common.bin2int(csbin[0:6])]
-    cs += chars[common.bin2int(csbin[6:12])]
-    cs += chars[common.bin2int(csbin[12:18])]
-    cs += chars[common.bin2int(csbin[18:24])]
-    cs += chars[common.bin2int(csbin[24:30])]
-    cs += chars[common.bin2int(csbin[30:36])]
-    cs += chars[common.bin2int(csbin[36:42])]
-    cs += chars[common.bin2int(csbin[42:48])]
-
-    # clean string, remove spaces and marks, if any.
-    # cs = cs.replace('_', '')
-    cs = cs.replace("#", "")
-    return cs
+    return capacity
